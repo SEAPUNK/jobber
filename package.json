@@ -1,0 +1,20 @@
+{
+  "name": "jobber",
+  "version": "0.0.0",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "standard"
+  },
+  "author": "Ivan K <ivan@sq10.net>",
+  "license": "MIT",
+  "dependencies": {
+    "aggregate-error": "^0.1.0",
+    "mini-copromise": "^3.0.1"
+  },
+  "devDependencies": {
+    "standard": "^8.2.0"
+  },
+  "engines": {
+    "node": ">=4"
+  }
+}
