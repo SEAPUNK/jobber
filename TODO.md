@@ -25,6 +25,7 @@ These are the things I want to add to Jobber.
   + [ ] progress
   + [ ] logging
   + [ ] pausing (Kue)
+  + [ ] identification (#8)
 
 - Stores
   + [ ] Redis
