@@ -1,0 +1,154 @@
+I'm having one hell of a time wrapping my head
+around the atomic operations I will need.
+
+Also, I need to have an idea of how I will be able to use Redis
+as a storage mechanism.
+
+I know I'm overthinking it at this point (yet again), but I
+want to make this work.
+
+---
+
+Someone creates a job:
+
+job {
+  id
+  type
+  state: (QUEUED, STARTED, COMPLETE, FAILED)
+  runner: client id
+
+  // ---
+
+  ////
+  // job delay @ semver-major
+  // (for this, we just need an extra check to queue delayed jobs)
+  ////
+  state += PENDING
+  delayed_until
+  queued_at
+
+  ////
+  // fail reason @ semver-minor
+  // (we can add this later w/ no prob)
+  ////
+  reason: (RUNNER_TIMEOUT, JOB_TIMEOUT, FAILED)
+
+  ////
+  // priority queue @ semver-major
+  // yeah, this can be added later as well
+  ////
+  [???]
+
+  ////
+  // retrying @ semver-major
+  // (???)
+  ////
+  // how many times the job was attempted
+  attempts: 5
+  // how many attempts are left for the job
+  currentAttempt: 1
+  // how long to wait in ms before queueing the job
+  delay: 1000
+
+  ////
+  // backoff @ semver-major
+  // (???)
+  ////
+  backoff: {
+    type: ''
+    [data...]
+  }
+  // if the job failed, the time we use to try again
+  next_attempt
+
+  ////
+  // job timeouts @ semver-major
+  // (for this, we need an extra check to find timed out jobs)
+  ////
+  timeout: {
+    _type: ('total', 'individual')
+    total: num?
+    idle: num?
+    run: num?
+  }
+  created_at
+  started_at
+  finished_at
+
+  ////
+  // job logs @ semver-major
+  // (???)
+  ////
+  logs: [
+    - type: (log, ???)
+      message: 'alsdkfjalskdflksadjf'
+  ]
+
+  ////
+  // job progress @ semver-major
+  // (???)
+  ////
+  progress: [percent in whole number, string]
+  logs->type += progress
+}
+
+job handlers { // this makes sure that jobs with handlers
+              // don't get automatically cleaned
+  job id
+  client id
+}
+
+client { // this keeps track of the clients
+  id
+
+  ////
+  // client timeout @ semver-major, persistent storage
+  ////
+  lastResponse
+}
+
+job runners { // this allows the runner to update status for the job
+  job id
+  client id
+}
+
+checks:
+
+@ FEAT client timeout
+
+  on client remove, we will need to make sure that jobs that are in the STARTED state has a client id (if there is no client ID, then that means that the runner for the job has died)
+
+
+========
+
+When is job added?
+
+When:
+- Client requests job creation
+
+When is job removed?
+
+When:
+- All handlers handle the job
+ + (TODO #17) Unless job is marked persistent
+- (TODO #18) Job is manually removed
+
+---
+
+When is client added?
+
+When:
+- Client registers itself (connection to listener, local API registration call)
+
+When is client removed?
+
+When:
+- (FEAT client timeout) Client times out
+
+---
+
+When is runner added?
+
+When:
+- Runner requests to handle the job (and there is no existing runner)
+
