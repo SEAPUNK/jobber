@@ -13,7 +13,7 @@
     "uuid": "^2.0.3"
   },
   "devDependencies": {
-    "standard": "^8.2.0"
+    "standard": "^8.4.0"
   },
   "engines": {
     "node": ">=4"
